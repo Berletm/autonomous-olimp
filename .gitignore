@@ -1,0 +1,8 @@
+debugger
+tasks
+student_attempts
+.venv
+.env
+*.png
+*.mp4
+recordings

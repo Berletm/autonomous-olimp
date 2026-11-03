@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix # Доступ к X11 для GUI
+      - ./volume:/app/volume
+    environment:
+      - LIBGL_ALWAYS_SOFTWARE=1 # Раскоментируйте, если есть проблемы с драйверами видеокарты.
+      - DISPLAY=${DISPLAY} # Прокидываем переменную окружения DISPLAY
+      - DRONE_CAMERA_WINDOW=1 # Отдельное окно камеры дрона рядом с PyBullet
+    network_mode: host # Используем сетевой режим хоста для доступа к X11

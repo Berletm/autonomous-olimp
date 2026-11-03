@@ -1,0 +1,8 @@
+services:
+  app:
+    image: dvivanov/aido-student-image:2026
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    volumes:
+      - .:/home/appuser/student
