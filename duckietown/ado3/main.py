@@ -184,49 +184,88 @@ class Controller:
 class Solution(TaskSolution):
     def __init__(self, generated_task):
         super().__init__(generated_task)
-        self.coefs = (1.0, 5.0, 5.0)
+        self.coefs = (2.0, 20.0, 10.0)
         self.dt = 1.0 / 30.0
-        self.traj_pth = "/home/throwdownyourtears/Desktop/code/ado-2026/duckietown/ado1/"
         self.env = self.generated_task["env"]
-        self.duck_pos = np.array([4.5 * self.env.road_tile_size, (self.env.grid_height - 1.9) * self.env.road_tile_size])
+        self.duck_pos = np.array([1.5 * self.env.road_tile_size, (self.env.grid_height - 1.5) * self.env.road_tile_size])
 
-        self.points = np.array([
-            # прямо вниз
-            (1, 1),
-            (2, 1),
-            (3, 1),
-            (4, 1),
-            (4.5, 1),
+        route_xy = np.array([
+            (4.45, 1.5),
+            (4.5, 1.5),
+            (4.55, 1.52),
+            (4.6, 1.59),
+            (4.65, 1.625),
+            (4.72, 1.64),
 
-            # налево прямо
-            (4.6913, 1.0381),
-            (4.8536, 1.1464),
-            (4.9619, 1.3087),
-            (5.0, 1.5),
-            (4.7, 2.5),
-            (5.0, 3.5),
-            (5.0, 4.5),
+            (5.02, 1.635),
+            (5.17, 1.63),
+            (5.35, 1.565),
+            (5.55, 1.47),
+            (5.75, 1.415),
+            (5.94, 1.425),
 
-            # налево прямо
-            (4.9619, 4.6913),
-            (4.8536, 4.8536),
-            (4.6913, 4.9619),
-            (4.5, 5.0),
-            (4.3087, 5.0381),
-            (4.1464, 5.1464),
-            (4.0381, 5.3087),
-            (4.0, 5.5),
-            (3.9619, 5.6913),
-            (3.8536, 5.8536),
-            (3.6913, 5.9619),
-            (3.5, 6.0),
-            (2.5, 5.75),
-            (2.3, 6.0),
-            (1.5, 6.0),
+            (6.08, 1.47),
+            (6.23, 1.56),
+            (6.34, 1.68),
+            (6.42, 1.82),
+            (6.52, 1.98),
+            (6.6, 2.14),
+            (6.65, 2.28),
+            (6.63, 2.42),
+            (6.55, 2.55),
+            (6.44, 2.7),
+            (6.38, 2.88),
+            (6.4, 3.06),
+            (6.46, 3.25),
 
-            (1.25, 5.0),
-            (1.4, 4.5)
+            (6.5, 3.5),
+            (6.5, 3.75),
+            (6.5, 4),
+            (6.4619, 4.1913),
+            (6.3536, 4.3536),
+            (6.1913, 4.4619),
+            (6, 4.5),
+            (5.8087, 4.5381),
+            (5.6464, 4.6464),
+            (5.5381, 4.8087),
+            (5.5, 5),
+            (5.4619, 5.1913),
+            (5.3536, 5.3536),
+            (5.1913, 5.4619),
+            (5, 5.5),
+            (4.75, 5.5),
+            (4.5, 5.5),
+            (4.3, 5.5),
+            (4, 5.5),
+            (3.7, 5.5),
+
+            (3.4, 5.5),
+            (3.2, 5.44),
+            (3.08, 5.38),
+            (2.97, 5.34),
+            (2.84, 5.34),
+            (2.72, 5.38),
+            (2.6, 5.46),
+            (2.47, 5.56),
+            (2.33, 5.62),
+            (2.18, 5.63),
+            (2, 5.5),
+
+            (1.8087, 5.4619),
+            (1.6464, 5.3536),
+            (1.5381, 5.1913),
+            (1.5, 5),
+            (1.5, 4.75),
+            (1.5, 4.5),
+            (1.5, 4),
+            (1.5, 3.5),
+            (1.5, 3),
+            (1.5, 2.5),
+            (1.5, 2),
+            (1.5, 1.75),
+            (1.5, 1.5),
         ], dtype=float)
+        self.points = route_xy[:, ::-1] - 0.5
 
         self.traj = [map2world(p[1], p[0], self.env.grid_height, self.env.road_tile_size) for p in self.points]
 
@@ -234,7 +273,7 @@ class Solution(TaskSolution):
         x, _, z = self.env.cur_pos
         traj = np.array(self.traj)
 
-        t = compute_time(traj, v_max=0.85)
+        t = compute_time(traj, v_max=0.8, omega_max=1.1)
         x_spline = Spline(t, traj[:, 0])
         y_spline = Spline(t, traj[:, 1])
         
@@ -250,7 +289,7 @@ class Solution(TaskSolution):
 
             dist = np.linalg.norm(np.array([x, cur_z]) - self.duck_pos)
             print(dist)
-            if dist <= 0.2:
+            if dist <= 0.24:
                 break
 
             action = controller.get_action(t, (x, cur_z), teta)
@@ -264,6 +303,6 @@ if __name__ == "__main__":
     from gym_duckietown.tasks.default.task_generator import DefaultTaskGenerator
 
     task_generator = DefaultTaskGenerator()
-    task_generator.generate_task(map_name="ado_map_3")
+    task_generator.generate_task(map_name="1ado_map_3", initial_pose=(4, 1))
     solution = Solution(task_generator.generated_task)
     solution.solve()
